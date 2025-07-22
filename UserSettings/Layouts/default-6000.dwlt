@@ -992,11 +992,11 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.12527238, y: 0.10456171, z: -0.01327797, w: -0.9865064}
+    m_Target: {x: -0.08717229, y: 0.89959055, z: -0.21045254, w: -0.3726226}
     speed: 2
     m_Value: {x: -0.12527238, y: 0.10456171, z: -0.013277971, w: -0.9865064}
   m_Size:
-    m_Target: 10
+    m_Target: 11.319509
     speed: 2
     m_Value: 10
   m_Ortho:
