@@ -74,6 +74,7 @@
     <Compile Include="Assets\Scripts\Core\UIManger.cs" />
     <Compile Include="Assets\Scripts\Gameplay\Enemies\EnemyBase.cs" />
     <Compile Include="Assets\Scripts\Gameplay\Enemies\RandomMoverEnemy.cs" />
+    <Compile Include="Assets\Scripts\UI\EnemyHealthBar.cs" />
     <Compile Include="Assets\Scripts\Gameplay\Player\PlayerStats.cs" />
   </ItemGroup>
   <ItemGroup>
