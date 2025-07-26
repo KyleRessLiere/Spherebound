@@ -42,12 +42,26 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     protected void CreateHealthBar()
     {
         GameObject barGO = new GameObject("EnemyHealthBar");
-        barGO.transform.SetParent(transform);
-        barGO.transform.localPosition = new Vector3(0, 2f, 0);
+        barGO.transform.SetParent(transform, false);
+
+        Vector3 worldPos = transform.position + Vector3.up * 2f; // fallback
+
+        var rend = GetComponentInChildren<Renderer>();
+        if (rend != null && Camera.main != null)
+        {
+            Vector3 top = rend.bounds.max;
+            Vector3 camUp = Camera.main.transform.up;         // or use forward if needed
+            worldPos = top + camUp.normalized * 0.5f;          // place bar above head from camera POV
+        }
+
+        // Convert world position to local relative to this transform
+        Vector3 localPos = transform.InverseTransformPoint(worldPos);
+        barGO.transform.localPosition = localPos;
 
         healthBar = barGO.AddComponent<EnemyHealthBar>();
         healthBar.Init(currentHP, maxHP);
     }
+
 
     protected void UpdateHealthBar()
     {
