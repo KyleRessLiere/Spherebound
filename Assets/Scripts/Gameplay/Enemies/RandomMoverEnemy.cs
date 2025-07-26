@@ -11,13 +11,12 @@ public class RandomMoverEnemy : EnemyBase
 
     public override void TakeTurn()
     {
-        // Try each direction up to 4 times
         for (int i = 0; i < dirs.Length; i++)
         {
             var d = dirs[Random.Range(0, dirs.Length)];
             if (TryMoveTo(coord + d))
                 return;
         }
-        // if none valid, stand still
+        // no valid move, do nothing
     }
 }

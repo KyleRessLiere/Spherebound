@@ -13,7 +13,6 @@ public class EnemyManager : MonoBehaviour
     }
 
     [Header("Enemy Spawns")]
-    [Tooltip("Size = the number of enemies you want to spawn")]
     public SpawnInfo[] spawns;
 
     private readonly List<IEnemy> enemies = new List<IEnemy>();
@@ -37,7 +36,6 @@ public class EnemyManager : MonoBehaviour
                 continue;
             }
 
-            // If it’s an EnemyBase, give it its starting coord
             if (e is EnemyBase eb)
                 eb.startCoord = s.startCoord;
 
@@ -45,12 +43,22 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Call this when you want every enemy to take its turn.
-    /// </summary>
+    /// <summary>Called by enemies when they die.</summary>
+    public void Unregister(IEnemy enemy)
+    {
+        enemies.Remove(enemy);
+    }
+
     public void TakeAllTurns()
     {
-        foreach (var e in enemies)
-            e.TakeTurn();
+        // Loop over a snapshot copy of the list
+        var snapshot = new List<IEnemy>(enemies);
+
+        foreach (var e in snapshot)
+        {
+            if (e is MonoBehaviour mb && mb != null)
+                e.TakeTurn();
+        }
     }
+
 }

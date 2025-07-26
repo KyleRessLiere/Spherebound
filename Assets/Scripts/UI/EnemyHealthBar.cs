@@ -1,37 +1,67 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Slider))]
 public class EnemyHealthBar : MonoBehaviour
 {
-    Slider slider;
-    Camera cam;
+    private RectTransform _fillRT;
+    private Camera _cam;
+    private float _maxWidth = 1.5f;
 
-    void Awake()
+    public void Init(int currentHP, int maxHP)
     {
-        slider = GetComponent<Slider>();
+        _cam = Camera.main;
 
-        // Try to find a world-space Canvas first:
-        var parentCanvas = GetComponentInParent<Canvas>();
-        if (parentCanvas != null && parentCanvas.renderMode == RenderMode.WorldSpace && parentCanvas.worldCamera != null)
-        {
-            cam = parentCanvas.worldCamera;
-        }
-        else
-        {
-            // fall back to main camera
-            cam = Camera.main;
-        }
+        // === Canvas ===
+        var canvasGO = new GameObject("HealthBarCanvas", typeof(Canvas), typeof(CanvasScaler));
+        canvasGO.transform.SetParent(transform, false);
+        var canvasRT = canvasGO.GetComponent<RectTransform>();
+        canvasRT.localPosition = Vector3.zero;
+        canvasRT.localScale = Vector3.one * 0.5f;
+        canvasRT.sizeDelta = new Vector2(_maxWidth, 0.25f);
+
+        var canvas = canvasGO.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = _cam;
+        canvas.sortingOrder = 10;
+
+        canvasGO.GetComponent<CanvasScaler>().dynamicPixelsPerUnit = 10;
+
+        // === Background ===
+        var bg = new GameObject("BG", typeof(Image));
+        bg.transform.SetParent(canvasGO.transform, false);
+        var bgImg = bg.GetComponent<Image>();
+        bgImg.color = Color.black;
+        var bgRT = bg.GetComponent<RectTransform>();
+        bgRT.anchorMin = Vector2.zero;
+        bgRT.anchorMax = Vector2.one;
+        bgRT.offsetMin = Vector2.zero;
+        bgRT.offsetMax = Vector2.zero;
+
+        // === Red Fill ===
+        var fill = new GameObject("Fill", typeof(Image));
+        fill.transform.SetParent(bg.transform, false);
+        var fillImg = fill.GetComponent<Image>();
+        fillImg.color = Color.red;
+
+        _fillRT = fill.GetComponent<RectTransform>();
+        _fillRT.pivot = new Vector2(0, 0.5f); // align left
+        _fillRT.anchorMin = new Vector2(0, 0.5f);
+        _fillRT.anchorMax = new Vector2(0, 0.5f);
+        _fillRT.anchoredPosition = Vector2.zero;
+        _fillRT.sizeDelta = new Vector2(_maxWidth, 0.25f); // start full
+
+        UpdateBar(currentHP, maxHP);
     }
 
-    void LateUpdate()
+    public void UpdateBar(int current, int max)
     {
-        if (cam != null)
-            transform.forward = cam.transform.forward;
+        float pct = Mathf.Clamp01((float)current / max);
+        _fillRT.sizeDelta = new Vector2(_maxWidth * pct, 0.25f);
     }
 
-    public void SetFraction(float frac)
+    public void FaceCamera()
     {
-        slider.value = Mathf.Clamp01(frac);
+        if (_cam != null)
+            transform.forward = _cam.transform.forward;
     }
 }
