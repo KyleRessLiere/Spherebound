@@ -9,9 +9,15 @@ public class SpikeCubeEnemy : EnemyBase
         Vector2Int.right
     };
 
-    void Reset()
+    protected override void Awake()
     {
-        modelYOffset = 0.0f; // Default lift to make it sit correctly on tile
+        base.Awake();
+        modelYOffset = 1.1f; // adjust for this model
+    }
+
+    protected override void Start()
+    {
+        base.Start();
     }
 
     public override void TakeTurn()
@@ -22,6 +28,5 @@ public class SpikeCubeEnemy : EnemyBase
             if (TryMoveTo(coord + d))
                 return;
         }
-        // No valid move, do nothing
     }
 }

@@ -9,9 +9,15 @@ public class RandomMoverEnemy : EnemyBase
         Vector2Int.right
     };
 
-    void Reset()
+    protected override void Awake()
     {
-        modelYOffset = 1.0f; // Set default value for RandomMover if needed
+        base.Awake();
+        modelYOffset = 0.5f; // tweak as needed
+    }
+
+    protected override void Start()
+    {
+        base.Start();
     }
 
     public override void TakeTurn()

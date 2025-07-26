@@ -20,17 +20,16 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     protected GridManager grid;
     protected Vector2Int coord;
     protected int currentHP;
-
     protected EnemyHealthBar healthBar;
 
     public Vector2Int CurrentCoord => coord;
 
-    void Awake()
+    // ✅ Make Awake protected so subclasses can override or call it
+    protected virtual void Awake()
     {
         grid = UnityEngine.Object.FindFirstObjectByType<GridManager>();
         currentHP = maxHP;
 
-        // Auto-assign modelTransform if not set manually
         if (modelTransform == null)
         {
             var rend = GetComponentInChildren<Renderer>();
@@ -39,7 +38,8 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
         }
     }
 
-    void Start()
+    // ✅ Make Start protected virtual so subclasses can override or call it
+    protected virtual void Start()
     {
         coord = startCoord;
         SnapToGrid();
@@ -58,7 +58,7 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
         GameObject barGO = new GameObject("EnemyHealthBar");
         barGO.transform.SetParent(transform, false);
 
-        Vector3 worldPos = transform.position + Vector3.up * 2f; // fallback
+        Vector3 worldPos = transform.position + Vector3.up * 2f;
 
         var rend = GetComponentInChildren<Renderer>();
         if (rend != null && Camera.main != null)
@@ -107,8 +107,6 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     protected void SnapToGrid()
     {
         Vector3 basePos = grid.CoordToWorld(coord.x, coord.y);
-
-        // Only use modelYOffset now — manual control
         transform.position = basePos + Vector3.up * modelYOffset;
     }
 

@@ -34,14 +34,11 @@ public class MovementModule
         var fromTile = grid.GetTile(entity.CurrentCoord);
         var toTile = grid.GetTile(target);
 
-        // flip occupancy
         fromTile.isOccupied = false;
         toTile.isOccupied = true;
 
-        // update logical coord
         entity.SetCoord(target);
 
-        // compute start/end world positions (with height offset)
         Vector3 startPos = fromTile.worldPos + Vector3.up * yOffset;
         Vector3 endPos = toTile.worldPos + Vector3.up * yOffset;
         float duration = 0.2f;
