@@ -122,4 +122,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startCoord: {x: 2, y: 4}
-  maxHP: 3
+  maxHP: 10

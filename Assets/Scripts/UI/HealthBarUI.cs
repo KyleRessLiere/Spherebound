@@ -1,5 +1,4 @@
-﻿// HealthBarUI.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -21,23 +20,33 @@ public class HealthBarUI : MonoBehaviour
 
         // 2) build a Screen‑Space Overlay canvas
         var canvasGO = new GameObject("HealthBarCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-        canvasGO.transform.SetParent(transform, false);
         var canvas = canvasGO.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 100;
-        canvasGO.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
-        // 3) background
+        var scaler = canvasGO.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+
+        // Fix: stretch canvas RectTransform to full screen
+        var canvasRT = canvasGO.GetComponent<RectTransform>();
+        canvasRT.anchorMin = Vector2.zero;
+        canvasRT.anchorMax = Vector2.one;
+        canvasRT.offsetMin = Vector2.zero;
+        canvasRT.offsetMax = Vector2.zero;
+
+        // 3) background container (anchored top-right)
         var bg = new GameObject("HealthBarBG", typeof(RectTransform), typeof(Image));
         bg.transform.SetParent(canvasGO.transform, false);
         var bgRT = bg.GetComponent<RectTransform>();
-        bgRT.anchorMin = bgRT.anchorMax = new Vector2(1, 1);
-        bgRT.pivot = new Vector2(1, 1);
-        bgRT.anchoredPosition = new Vector2(-10, -10);
+        bgRT.anchorMin = new Vector2(1, 1);  // top-right
+        bgRT.anchorMax = new Vector2(1, 1);  // top-right
+        bgRT.pivot = new Vector2(1, 1);      // pivot also top-right
+        bgRT.anchoredPosition = new Vector2(-10, -10); // offset from top-right
         bgRT.sizeDelta = new Vector2(200, 20);
         bg.GetComponent<Image>().color = Color.gray;
 
-        // 4) fill
+        // 4) fill bar
         var fg = new GameObject("HealthBarFill", typeof(RectTransform), typeof(Image));
         fg.transform.SetParent(bg.transform, false);
         var fgRT = fg.GetComponent<RectTransform>();
@@ -57,7 +66,6 @@ public class HealthBarUI : MonoBehaviour
     void UpdateBar(int hp)
     {
         float pct = (float)hp / _playerStats.maxHealth;
-        Debug.Log($"[HealthBarUI] setting fill to {pct:0.00}");
         _fillImage.fillAmount = Mathf.Clamp01(pct);
     }
 }

@@ -64,18 +64,19 @@
     <Compile Include="Assets\Scripts\Core\GridManager.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
     <Compile Include="Assets\Scripts\Core\IGridEntity.cs" />
+    <Compile Include="Assets\Scripts\Enemies\RandomMoverEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemies\EnemyBase.cs" />
+    <Compile Include="Assets\Scripts\Enemies\SpikeCubeEnemy.cs" />
     <Compile Include="Assets\Scripts\UI\HealthBarUI.cs" />
-    <Compile Include="Assets\Scripts\Gameplay\Player\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Core\MovementModule.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Systems\TurnSystem\EnemyManger.cs" />
     <Compile Include="Assets\Scripts\Systems\TurnSystem\TurnManager.cs" />
     <Compile Include="Assets\Scripts\Core\IEnemy.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerStats.cs" />
     <Compile Include="Assets\Scripts\Core\UIManger.cs" />
-    <Compile Include="Assets\Scripts\Gameplay\Enemies\EnemyBase.cs" />
-    <Compile Include="Assets\Scripts\Gameplay\Enemies\RandomMoverEnemy.cs" />
     <Compile Include="Assets\Scripts\UI\EnemyHealthBar.cs" />
-    <Compile Include="Assets\Scripts\Gameplay\Player\PlayerStats.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
