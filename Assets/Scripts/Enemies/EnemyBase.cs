@@ -3,19 +3,15 @@
 public abstract class EnemyBase : MonoBehaviour, IEnemy
 {
     [Header("Grid Setup")]
-    [Tooltip("Initial grid coordinate")]
     public Vector2Int startCoord;
 
     [Header("Health")]
-    [Tooltip("Maximum hit points")]
     public int maxHP = 3;
 
     [Header("Model Positioning")]
-    [Tooltip("Assign the visible model transform (optional)")]
     public Transform modelTransform;
-
-    [Tooltip("Custom Y offset from tile base (adjust per enemy type)")]
     public float modelYOffset = 0f;
+    public Vector2 modelOffsetXZ = Vector2.zero; // ⬅️ New: offset X/Z across tiles
 
     protected GridManager grid;
     protected Vector2Int coord;
@@ -24,8 +20,7 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
 
     public Vector2Int CurrentCoord => coord;
 
-    // ✅ Make Awake protected so subclasses can override or call it
-    protected virtual void Awake()
+    public virtual void Awake()
     {
         grid = UnityEngine.Object.FindFirstObjectByType<GridManager>();
         currentHP = maxHP;
@@ -38,8 +33,7 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
         }
     }
 
-    // ✅ Make Start protected virtual so subclasses can override or call it
-    protected virtual void Start()
+    public virtual void Start()
     {
         coord = startCoord;
         SnapToGrid();
@@ -100,14 +94,15 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
         grid.GetTile(coord).isOccupied = true;
         SnapToGrid();
 
-        TakeDamage(1); // Deal 1 damage on move
+        TakeDamage(1);
         return true;
     }
 
     protected void SnapToGrid()
     {
         Vector3 basePos = grid.CoordToWorld(coord.x, coord.y);
-        transform.position = basePos + Vector3.up * modelYOffset;
+        basePos += new Vector3(modelOffsetXZ.x, modelYOffset, modelOffsetXZ.y);
+        transform.position = basePos;
     }
 
     public void SetCoord(Vector2Int newCoord)
@@ -118,11 +113,9 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     protected virtual void Die()
     {
         grid.GetTile(coord).isOccupied = false;
-
         var manager = FindObjectOfType<EnemyManager>();
         if (manager != null)
             manager.Unregister(this);
-
         Destroy(gameObject);
     }
 

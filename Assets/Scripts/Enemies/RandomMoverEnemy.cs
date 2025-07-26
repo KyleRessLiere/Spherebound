@@ -9,13 +9,14 @@ public class RandomMoverEnemy : EnemyBase
         Vector2Int.right
     };
 
-    protected override void Awake()
+    public override void Awake()
     {
         base.Awake();
-        modelYOffset = 0.5f; // tweak as needed
+        modelYOffset = 0.5f;
+        modelOffsetXZ = Vector2.zero;
     }
 
-    protected override void Start()
+    public override void Start()
     {
         base.Start();
     }
