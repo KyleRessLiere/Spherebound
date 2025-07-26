@@ -9,6 +9,11 @@ public class RandomMoverEnemy : EnemyBase
         Vector2Int.right
     };
 
+    void Reset()
+    {
+        modelYOffset = 1.0f; // Set default value for RandomMover if needed
+    }
+
     public override void TakeTurn()
     {
         for (int i = 0; i < dirs.Length; i++)
@@ -17,6 +22,5 @@ public class RandomMoverEnemy : EnemyBase
             if (TryMoveTo(coord + d))
                 return;
         }
-        // no valid move, do nothing
     }
 }

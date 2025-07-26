@@ -10,6 +10,13 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     [Tooltip("Maximum hit points")]
     public int maxHP = 3;
 
+    [Header("Model Positioning")]
+    [Tooltip("Assign the visible model transform (optional)")]
+    public Transform modelTransform;
+
+    [Tooltip("Custom Y offset from tile base (adjust per enemy type)")]
+    public float modelYOffset = 0f;
+
     protected GridManager grid;
     protected Vector2Int coord;
     protected int currentHP;
@@ -22,6 +29,14 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     {
         grid = UnityEngine.Object.FindFirstObjectByType<GridManager>();
         currentHP = maxHP;
+
+        // Auto-assign modelTransform if not set manually
+        if (modelTransform == null)
+        {
+            var rend = GetComponentInChildren<Renderer>();
+            if (rend != null)
+                modelTransform = rend.transform;
+        }
     }
 
     void Start()
@@ -92,18 +107,10 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     protected void SnapToGrid()
     {
         Vector3 basePos = grid.CoordToWorld(coord.x, coord.y);
-        float yOffset = 0.5f;
 
-        var rend = GetComponentInChildren<Renderer>();
-        if (rend != null)
-        {
-            // Use only bounds size, not center
-            yOffset = rend.bounds.size.y * 0.5f;
-        }
-
-        transform.position = basePos + Vector3.up * yOffset;
+        // Only use modelYOffset now — manual control
+        transform.position = basePos + Vector3.up * modelYOffset;
     }
-
 
     public void SetCoord(Vector2Int newCoord)
     {
