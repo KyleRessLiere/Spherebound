@@ -61,17 +61,22 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.1.12f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\GridManager.cs" />
-    <Compile Include="Assets\Scripts\EnemyManger.cs" />
-    <Compile Include="Assets\Scripts\MovementModule.cs" />
-    <Compile Include="Assets\Scripts\EnemyBase.cs" />
-    <Compile Include="Assets\Scripts\PlayerController.cs" />
-    <Compile Include="Assets\Scripts\TurnManager.cs" />
-    <Compile Include="Assets\Scripts\IGridEntity.cs" />
-    <Compile Include="Assets\Scripts\IEnemy.cs" />
+    <Compile Include="Assets\Scripts\Core\GridManager.cs" />
+    <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Core\IGridEntity.cs" />
+    <Compile Include="Assets\Scripts\Enemies\RandomMoverEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemies\EnemyBase.cs" />
+    <Compile Include="Assets\Scripts\Enemies\SpikeCubeEnemy.cs" />
+    <Compile Include="Assets\Scripts\UI\HealthBarUI.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementModule.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Scripts\RandomMoverEnemy.cs" />
-    <Compile Include="Assets\Scripts\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Systems\TurnSystem\EnemyManger.cs" />
+    <Compile Include="Assets\Scripts\Systems\TurnSystem\TurnManager.cs" />
+    <Compile Include="Assets\Scripts\Core\IEnemy.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerStats.cs" />
+    <Compile Include="Assets\Scripts\Core\UIManger.cs" />
+    <Compile Include="Assets\Scripts\UI\EnemyHealthBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
