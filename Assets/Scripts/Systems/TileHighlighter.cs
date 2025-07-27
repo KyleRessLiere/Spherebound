@@ -3,42 +3,42 @@ using UnityEngine;
 
 public class TileHighlighter : MonoBehaviour
 {
+    [SerializeField] private GridManager grid;
     public GameObject highlightPrefab;
 
     private readonly List<GameObject> activeHighlights = new();
-    private GridManager grid;
 
     void Awake()
     {
-        grid = FindObjectOfType<GridManager>();
         if (grid == null)
         {
-            Debug.LogError("TileHighlighter: GridManager not found.");
+            Debug.LogError("TileHighlighter: GridManager not assigned in inspector.");
         }
     }
 
-    public void ShowTiles(List<Vector2Int> coords, GridManager grid)
+    public void ShowTiles(List<Vector2Int> coords, GridManager gridOverride = null)
     {
         ClearTiles();
 
+        GridManager useGrid = gridOverride ?? grid;
+
         foreach (var coord in coords)
         {
-            if (!grid.IsValidCoord(coord)) continue;
+            if (!useGrid.IsValidCoord(coord)) continue;
 
-            Tile tile = grid.GetTile(coord);
+            Tile tile = useGrid.GetTile(coord);
             Vector3 tilePos = tile.worldPos;
 
-            float tileHeight = grid.tilePrefab.GetComponent<Renderer>().bounds.size.y;
+            float tileHeight = useGrid.tilePrefab.GetComponent<Renderer>().bounds.size.y;
             Vector3 highlightPos = tilePos + Vector3.up * (tileHeight + 0.01f);
 
             GameObject go = Instantiate(highlightPrefab, highlightPos, Quaternion.Euler(90, 0, 0));
             go.transform.SetParent(transform);
-            MatchTileSize(go);
+            MatchTileSize(go, useGrid);
 
             activeHighlights.Add(go);
         }
     }
-
 
     public void ClearTiles()
     {
@@ -49,11 +49,11 @@ public class TileHighlighter : MonoBehaviour
         activeHighlights.Clear();
     }
 
-    private void MatchTileSize(GameObject highlight)
+    private void MatchTileSize(GameObject highlight, GridManager gm)
     {
-        if (grid.tilePrefab != null)
+        if (gm.tilePrefab != null)
         {
-            Renderer tileRenderer = grid.tilePrefab.GetComponent<Renderer>();
+            Renderer tileRenderer = gm.tilePrefab.GetComponent<Renderer>();
             if (tileRenderer != null)
             {
                 Vector3 tileSize = tileRenderer.bounds.size;

@@ -7,24 +7,22 @@ public class UIManager : MonoBehaviour
     public Vector2 size = new Vector2(200, 20);
     public Vector2 offset = new Vector2(-10, -10);
 
-    [Header("Tile Highlighting")]
-    public TileHighlighter tileHighlighter;  // <-- Manually assign in Inspector
+    [Header("References")]
+    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private TileHighlighter tileHighlighter;
 
-    private PlayerStats _stats;
     private Image _fillImage;
     private Sprite _rectSprite;
 
     void Start()
     {
-        // 1) Grab the PlayerStats
-        _stats = FindObjectOfType<PlayerStats>();
-        if (_stats == null)
+        if (playerStats == null)
         {
-            Debug.LogError("UIManager: no PlayerStats found!");
+            Debug.LogError("❌ UIManager: PlayerStats not assigned in Inspector.");
             return;
         }
 
-        // 2) Create 1×1 white texture → Sprite
+        // 1×1 white texture sprite
         var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
         tex.SetPixel(0, 0, Color.white);
         tex.Apply();
@@ -37,7 +35,7 @@ public class UIManager : MonoBehaviour
             SpriteMeshType.FullRect
         );
 
-        // 3) Create Canvas
+        // Create canvas
         var canvasGO = new GameObject("HealthBarCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         canvasGO.transform.SetParent(transform, false);
         var canvas = canvasGO.GetComponent<Canvas>();
@@ -47,7 +45,7 @@ public class UIManager : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
 
-        // 4) Background
+        // Background
         var bgGO = new GameObject("HealthBarBG", typeof(RectTransform), typeof(Image));
         bgGO.transform.SetParent(canvasGO.transform, false);
         var bgRT = bgGO.GetComponent<RectTransform>();
@@ -60,7 +58,7 @@ public class UIManager : MonoBehaviour
         bgImage.type = Image.Type.Simple;
         bgImage.color = new Color(0.2f, 0.2f, 0.2f);
 
-        // 5) Fill
+        // Fill
         var fillGO = new GameObject("HealthBarFill", typeof(RectTransform), typeof(Image));
         fillGO.transform.SetParent(bgGO.transform, false);
         var fillRT = fillGO.GetComponent<RectTransform>();
@@ -75,14 +73,14 @@ public class UIManager : MonoBehaviour
         _fillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
         _fillImage.color = Color.green;
 
-        // 6) Subscribe
-        _stats.OnHealthChanged += UpdateBar;
-        UpdateBar(_stats.CurrentHealth);
+        // Subscribe to health updates
+        playerStats.OnHealthChanged += UpdateBar;
+        UpdateBar(playerStats.CurrentHealth);
     }
 
     private void UpdateBar(int current)
     {
-        float pct = (float)current / _stats.maxHealth;
+        float pct = (float)current / playerStats.maxHealth;
         _fillImage.fillAmount = Mathf.Clamp01(pct);
     }
 }

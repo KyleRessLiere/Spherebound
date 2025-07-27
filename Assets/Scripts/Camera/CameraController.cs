@@ -49,7 +49,7 @@ public class CameraController : MonoBehaviour
         // 🔒 Force perspective
         cam.orthographic = false;
         cam.fieldOfView = fov;
-        Debug.Log("Camera forced to Perspective Mode");
+      //  Debug.Log("Camera forced to Perspective Mode");
 
         // Set camera position and rotation
         transform.position = new Vector3(xOffset, height, -backDistance);
