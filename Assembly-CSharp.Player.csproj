@@ -63,11 +63,13 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Core\GridManager.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Systems\AttackInstance.cs" />
     <Compile Include="Assets\Scripts\Systems\TurnManager.cs" />
     <Compile Include="Assets\Scripts\Core\IGridEntity.cs" />
     <Compile Include="Assets\Scripts\Enemies\RandomMoverEnemy.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerClassBase.cs" />
     <Compile Include="Assets\Scripts\Enemies\EnemyBase.cs" />
+    <Compile Include="Assets\Scripts\Systems\TileHighlighter.cs" />
     <Compile Include="Assets\Scripts\Enemies\SpikeCubeEnemy.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMenuUI.cs" />
     <Compile Include="Assets\Scripts\UI\HealthBarUI.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Assets\Scripts\Core\IPlayer..cs" />
     <Compile Include="Assets\Scripts\Core\IEnemy.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerStats.cs" />
+    <Compile Include="Assets\Scripts\Enemies\ChargerEnemy.cs" />
     <Compile Include="Assets\Scripts\Player\StrikerClass.cs" />
     <Compile Include="Assets\Scripts\Core\UIManger.cs" />
     <Compile Include="Assets\Scripts\UI\EnemyHealthBar.cs" />

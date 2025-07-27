@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public interface IPlayerClass
+public interface IPlayer
 {
-    void Attack(Vector2Int origin, Vector2Int direction);
+    List<AttackInstance> GetAttackPreview(Vector2Int origin, GridManager grid);
+    void Attack(Vector2Int origin, GridManager grid);
 }

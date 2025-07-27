@@ -1,5 +1,4 @@
-﻿// UIManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -7,6 +6,9 @@ public class UIManager : MonoBehaviour
     [Header("Health Bar Layout")]
     public Vector2 size = new Vector2(200, 20);
     public Vector2 offset = new Vector2(-10, -10);
+
+    [Header("Tile Highlighting")]
+    public TileHighlighter tileHighlighter;  // <-- Manually assign in Inspector
 
     private PlayerStats _stats;
     private Image _fillImage;
@@ -22,7 +24,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // 2) Create a 1×1 white texture → Sprite for rectangles
+        // 2) Create 1×1 white texture → Sprite
         var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
         tex.SetPixel(0, 0, Color.white);
         tex.Apply();
@@ -35,7 +37,7 @@ public class UIManager : MonoBehaviour
             SpriteMeshType.FullRect
         );
 
-        // 3) Build the Overlay Canvas
+        // 3) Create Canvas
         var canvasGO = new GameObject("HealthBarCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         canvasGO.transform.SetParent(transform, false);
         var canvas = canvasGO.GetComponent<Canvas>();
@@ -45,7 +47,7 @@ public class UIManager : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
 
-        // 4) Background Image (dark gray)
+        // 4) Background
         var bgGO = new GameObject("HealthBarBG", typeof(RectTransform), typeof(Image));
         bgGO.transform.SetParent(canvasGO.transform, false);
         var bgRT = bgGO.GetComponent<RectTransform>();
@@ -58,7 +60,7 @@ public class UIManager : MonoBehaviour
         bgImage.type = Image.Type.Simple;
         bgImage.color = new Color(0.2f, 0.2f, 0.2f);
 
-        // 5) Fill Image (green, filled)
+        // 5) Fill
         var fillGO = new GameObject("HealthBarFill", typeof(RectTransform), typeof(Image));
         fillGO.transform.SetParent(bgGO.transform, false);
         var fillRT = fillGO.GetComponent<RectTransform>();
@@ -73,7 +75,7 @@ public class UIManager : MonoBehaviour
         _fillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
         _fillImage.color = Color.green;
 
-        // 6) Subscribe & initialize
+        // 6) Subscribe
         _stats.OnHealthChanged += UpdateBar;
         UpdateBar(_stats.CurrentHealth);
     }

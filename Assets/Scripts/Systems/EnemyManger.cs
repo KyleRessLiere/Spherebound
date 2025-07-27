@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+    public static EnemyManager Instance { get; private set; }
+
     [System.Serializable]
     public struct SpawnInfo
     {
@@ -14,6 +16,17 @@ public class EnemyManager : MonoBehaviour
     public SpawnInfo[] spawns;
 
     private readonly List<IEnemy> enemies = new List<IEnemy>();
+
+    void Awake()
+    {
+        // Singleton setup
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     void Start()
     {
@@ -62,5 +75,15 @@ public class EnemyManager : MonoBehaviour
         foreach (var e in enemies)
             if (e.CurrentCoord == coord)
                 yield return e;
+    }
+
+    // Optional utility
+    public IEnemy GetEnemyAt(Vector2Int coord)
+    {
+        foreach (var e in enemies)
+            if (e.CurrentCoord == coord)
+                return e;
+
+        return null;
     }
 }

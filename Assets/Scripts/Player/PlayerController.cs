@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(PlayerStats))]
 public class PlayerController : MonoBehaviour, IGridEntity
@@ -11,12 +12,19 @@ public class PlayerController : MonoBehaviour, IGridEntity
     MovementModule mover;
     PlayerStats stats;
 
-    public IPlayerClass playerClass;
-    Vector2Int lastMoveDir = Vector2Int.up;
+    public IPlayer playerClass;
 
     [Header("Context Menu UI")]
-    private GameObject contextMenu;         // PlayerContextMenu child
-    private Button attackButton;            // UI Button component
+    private GameObject contextMenu;
+    private Button attackButton;
+
+    private const float ContextMenuOffsetRight = 1.2f;
+    private const float ContextMenuOffsetUp = 0.4f;
+
+    private bool isPreviewingAttack = false;
+    private TileHighlighter highlighter;
+
+    private List<AttackInstance> currentPreview = new();
 
     void Start()
     {
@@ -24,7 +32,7 @@ public class PlayerController : MonoBehaviour, IGridEntity
         stats = GetComponent<PlayerStats>();
         stats.ResetActions();
 
-        playerClass = new StrikerClass(this);
+        playerClass = new StrikerClass(this); // Replaceable with other classes
 
         CurrentCoord = new Vector2Int(grid.width / 2, 1);
         float tileHalfH = grid.tilePrefab.transform.localScale.y * 0.5f;
@@ -36,7 +44,6 @@ public class PlayerController : MonoBehaviour, IGridEntity
         grid.GetTile(CurrentCoord).isOccupied = true;
         mover = new MovementModule(this, this, grid, yOffset);
 
-        // 🔍 Find context menu and attack button
         contextMenu = transform.Find("PlayerContextMenu")?.gameObject;
         attackButton = contextMenu?.GetComponentInChildren<Button>();
 
@@ -57,6 +64,12 @@ public class PlayerController : MonoBehaviour, IGridEntity
         else
         {
             Debug.LogWarning("⚠️ PlayerContextMenu not found under Player");
+        }
+
+        highlighter = FindObjectOfType<TileHighlighter>();
+        if (highlighter == null)
+        {
+            Debug.LogWarning("⚠️ TileHighlighter not found in scene.");
         }
     }
 
@@ -84,7 +97,7 @@ public class PlayerController : MonoBehaviour, IGridEntity
     {
         if (contextMenu != null && contextMenu.activeSelf)
         {
-            Vector3 offset = transform.right * 0.7f + Vector3.up * 0.4f;
+            Vector3 offset = transform.right * ContextMenuOffsetRight + Vector3.up * ContextMenuOffsetUp;
             contextMenu.transform.position = transform.position + offset;
 
             if (Camera.main != null)
@@ -109,20 +122,50 @@ public class PlayerController : MonoBehaviour, IGridEntity
         mover.TryMove(target);
         CurrentCoord = target;
         grid.GetTile(CurrentCoord).isOccupied = true;
-        lastMoveDir = dir;
 
-        stats.ChangeHealth(-1); // TEMP test damage
+        stats.ChangeHealth(-1); // TEMP
+
+        if (isPreviewingAttack)
+            CancelAttackPreview();
     }
 
     public void OnAttackButtonClicked()
     {
-        if (stats.TryUseAction())
+        if (!isPreviewingAttack)
         {
-            playerClass.Attack(CurrentCoord, lastMoveDir);
-        }
+            currentPreview = playerClass.GetAttackPreview(CurrentCoord, grid);
+            List<Vector2Int> affectedCoords = new();
+            foreach (var atk in currentPreview)
+                affectedCoords.Add(atk.targetCoord);
 
-        if (contextMenu != null)
-            contextMenu.SetActive(false);
+            highlighter?.ShowTiles(affectedCoords, grid);
+            isPreviewingAttack = true;
+        }
+        else
+        {
+            if (stats.TryUseAction())
+            {
+                foreach (var atk in currentPreview)
+                {
+                    var enemies = EnemyManager.Instance.GetEnemiesOnTile(atk.targetCoord);
+                    foreach (var enemy in enemies)
+                    {
+                        if (enemy is EnemyBase eBase)
+                            eBase.TakeDamage(atk.damage);
+                    }
+                }
+            }
+
+            CancelAttackPreview();
+            contextMenu?.SetActive(false);
+        }
+    }
+
+    void CancelAttackPreview()
+    {
+        highlighter?.ClearTiles();
+        currentPreview.Clear();
+        isPreviewingAttack = false;
     }
 
     public void SetCoord(Vector2Int newCoord) => CurrentCoord = newCoord;
