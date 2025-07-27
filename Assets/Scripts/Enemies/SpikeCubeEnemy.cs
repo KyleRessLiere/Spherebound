@@ -23,11 +23,12 @@ public class SpikeCubeEnemy : EnemyBase
 
     public override void TakeTurn()
     {
-        for (int i = 0; i < dirs.Length; i++)
-        {
-            var d = dirs[Random.Range(0, dirs.Length)];
-            if (TryMoveTo(coord + d))
-                return;
-        }
+        print("Spike Turn ");
+        //for (int i = 0; i < dirs.Length; i++)
+        //{
+        //    var d = dirs[Random.Range(0, dirs.Length)];
+        //    if (TryMoveTo(coord + d))
+        //        return;
+        //}
     }
 }

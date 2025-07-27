@@ -6,9 +6,7 @@ public class EnemyManager : MonoBehaviour
     [System.Serializable]
     public struct SpawnInfo
     {
-        [Tooltip("Drag your enemy prefab here (must implement IEnemy)")]
         public GameObject prefab;
-        [Tooltip("Grid coordinate where this enemy will start")]
         public Vector2Int startCoord;
     }
 
@@ -23,15 +21,16 @@ public class EnemyManager : MonoBehaviour
         {
             if (s.prefab == null)
             {
-                Debug.LogWarning("EnemyManager: prefab is null in spawns array");
+                Debug.LogWarning("EnemyManager: prefab is null");
                 continue;
             }
 
-            var go = Instantiate(s.prefab);
-            var e = go.GetComponent<IEnemy>();
+            GameObject go = Instantiate(s.prefab);
+            IEnemy e = go.GetComponent<IEnemy>();
+
             if (e == null)
             {
-                Debug.LogError($"Prefab {s.prefab.name} has no IEnemy component!");
+                Debug.LogError($"Prefab {s.prefab.name} has no IEnemy!");
                 Destroy(go);
                 continue;
             }
@@ -43,7 +42,6 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    /// <summary>Called by enemies when they die.</summary>
     public void Unregister(IEnemy enemy)
     {
         enemies.Remove(enemy);
@@ -51,9 +49,7 @@ public class EnemyManager : MonoBehaviour
 
     public void TakeAllTurns()
     {
-        // Loop over a snapshot copy of the list
         var snapshot = new List<IEnemy>(enemies);
-
         foreach (var e in snapshot)
         {
             if (e is MonoBehaviour mb && mb != null)
@@ -61,4 +57,10 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
+    public IEnumerable<IEnemy> GetEnemiesOnTile(Vector2Int coord)
+    {
+        foreach (var e in enemies)
+            if (e.CurrentCoord == coord)
+                yield return e;
+    }
 }
