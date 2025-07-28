@@ -13,7 +13,7 @@ public class GridManager : MonoBehaviour
     public float halfGap = 1f;
 
     [Header("Visual Tile Prefab")]
-    public GameObject tilePrefab;  // drag your thin‐cube prefab here
+    public GameObject tilePrefab;
 
     private Tile[,] grid;
 
@@ -31,22 +31,25 @@ public class GridManager : MonoBehaviour
         float halfH = (height - 1) * 0.5f;
 
         for (int x = 0; x < width; x++)
+        {
             for (int y = 0; y < height; y++)
             {
-                // center around origin:
                 float worldX = (x - halfW) * step;
                 float worldZ = (y - halfH) * step;
                 if (y >= splitRow) worldZ += halfGap;
 
                 Vector3 pos = new Vector3(worldX, 0f, worldZ);
-                grid[x, y] = new Tile(new Vector2Int(x, y), pos);
+                GameObject tileGO = null;
 
                 if (tilePrefab != null)
                 {
-                    var go = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
-                    go.name = $"Tile_{x}_{y}";
+                    tileGO = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
+                    tileGO.name = $"Tile_{x}_{y}";
                 }
+
+                grid[x, y] = new Tile(new Vector2Int(x, y), pos, tileGO);
             }
+        }
     }
 
     public Vector3 CoordToWorld(int x, int y)
@@ -64,11 +67,13 @@ public class Tile
     public Vector2Int coord;
     public Vector3 worldPos;
     public bool isOccupied;
+    public GameObject tileObject;  // <-- Reference to the visual GameObject
 
-    public Tile(Vector2Int coord, Vector3 pos)
+    public Tile(Vector2Int coord, Vector3 pos, GameObject tileObject)
     {
         this.coord = coord;
         this.worldPos = pos;
+        this.tileObject = tileObject;
         this.isOccupied = false;
     }
 }

@@ -1,5 +1,4 @@
-﻿// TurnManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -10,19 +9,27 @@ public class TurnManager : MonoBehaviour
     public EnemyManager enemyManager;
 
     [Header("UI")]
-    [Tooltip("The single button that shows moves or ends the turn")]
     public Button actionButton;
-    [Tooltip("The TextMeshPro label inside the button")]
     public TMP_Text actionButtonText;
 
     private PlayerStats stats;
 
     void Start()
     {
+        if (player == null || actionButton == null || actionButtonText == null)
+        {
+            Debug.LogError("❌ TurnManager: UI references (actionButton or actionButtonText) are not set.");
+            return;
+        }
+
         stats = player.GetComponent<PlayerStats>();
+        if (stats == null)
+        {
+            Debug.LogError("❌ TurnManager: No PlayerStats found on player.");
+            return;
+        }
 
         actionButton.onClick.AddListener(OnActionButtonClicked);
-
         stats.OnActionsChanged += _ => RefreshButton();
 
         stats.ResetActions();

@@ -11,7 +11,7 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     [Header("Model Positioning")]
     public Transform modelTransform;
     public float modelYOffset = 0f;
-    public Vector2 modelOffsetXZ = Vector2.zero; // ⬅️ New: offset X/Z across tiles
+    public Vector2 modelOffsetXZ = Vector2.zero;
 
     protected GridManager grid;
     protected Vector2Int coord;
@@ -94,7 +94,7 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
         grid.GetTile(coord).isOccupied = true;
         SnapToGrid();
 
-        TakeDamage(1);
+        TakeDamage(1); // Debug damage on move
         return true;
     }
 
@@ -113,7 +113,7 @@ public abstract class EnemyBase : MonoBehaviour, IEnemy
     protected virtual void Die()
     {
         grid.GetTile(coord).isOccupied = false;
-        var manager = FindObjectOfType<EnemyManager>();
+        var manager = UnityEngine.Object.FindFirstObjectByType<EnemyManager>();
         if (manager != null)
             manager.Unregister(this);
         Destroy(gameObject);

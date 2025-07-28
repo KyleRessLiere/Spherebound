@@ -20,14 +20,11 @@ public class PlayerController : MonoBehaviour, IGridEntity
     private Button attackButton;
     private Button moveButton;
 
-    private const float ContextMenuOffsetRight = 1.2f;
-    private const float ContextMenuOffsetUp = 0.4f;
-
     private bool isPreviewingAttack = false;
+    private bool isPreviewingMove = false;
+
     private TileHighlighter highlighter;
     private List<AttackInstance> currentPreview = new();
-
-    private bool isPreviewingMove = false;
     private List<Vector2Int> currentMoveOptions = new();
 
     void Start()
@@ -48,13 +45,11 @@ public class PlayerController : MonoBehaviour, IGridEntity
         grid.GetTile(CurrentCoord).isOccupied = true;
         mover = new MovementModule(this, this, grid, yOffset);
 
-        contextMenu = transform.Find("PlayerContextMenu")?.gameObject;
+        contextMenu = GameObject.Find("PlayerContextMenu");
 
         if (contextMenu != null)
         {
             contextMenu.SetActive(false);
-            contextMenu.transform.localScale = Vector3.one * 0.01f;
-
             var buttons = contextMenu.GetComponentsInChildren<Button>(true);
             attackButton = buttons.FirstOrDefault(b => b.name == "AttackButton");
             moveButton = buttons.FirstOrDefault(b => b.name == "MoveButton");
@@ -71,7 +66,7 @@ public class PlayerController : MonoBehaviour, IGridEntity
         }
         else
         {
-            Debug.LogWarning("⚠️ PlayerContextMenu not found under Player");
+            Debug.LogWarning("⚠️ PlayerContextMenu not found in scene.");
         }
 
         highlighter = FindAnyObjectByType<TileHighlighter>();
@@ -90,6 +85,9 @@ public class PlayerController : MonoBehaviour, IGridEntity
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            if (IsPointerOverContextMenu())
+                return;
+
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
@@ -126,22 +124,6 @@ public class PlayerController : MonoBehaviour, IGridEntity
         }
     }
 
-    void LateUpdate()
-    {
-        if (contextMenu != null && contextMenu.activeSelf)
-        {
-            Vector3 offset = transform.right * ContextMenuOffsetRight + Vector3.up * ContextMenuOffsetUp;
-            contextMenu.transform.position = transform.position + offset;
-
-            if (Camera.main != null)
-            {
-                contextMenu.transform.rotation = Quaternion.LookRotation(
-                    contextMenu.transform.position - Camera.main.transform.position
-                );
-            }
-        }
-    }
-
     void TryMoveTo(Vector2Int target)
     {
         if (!stats.TryUseAction())
@@ -156,36 +138,13 @@ public class PlayerController : MonoBehaviour, IGridEntity
         CancelMovePreview();
     }
 
-    void AttemptMove(Vector2Int dir)
-    {
-        var target = CurrentCoord + dir;
-        if (!grid.IsValidCoord(target) || grid.GetTile(target).isOccupied)
-            return;
-
-        if (!stats.TryUseAction())
-            return;
-
-        grid.GetTile(CurrentCoord).isOccupied = false;
-        mover.TryMove(target);
-        CurrentCoord = target;
-        grid.GetTile(CurrentCoord).isOccupied = true;
-
-        stats.ChangeHealth(-1); // TEMP
-
-        if (isPreviewingAttack)
-            CancelAttackPreview();
-    }
-
     public void OnAttackButtonClicked()
     {
         if (!isPreviewingAttack)
         {
             currentPreview = playerClass.GetAttackPreview(CurrentCoord, grid);
-            List<Vector2Int> coords = new();
-            foreach (var atk in currentPreview)
-                coords.Add(atk.targetCoord);
-
-            highlighter?.ShowTiles(coords, grid);
+            List<Vector2Int> coords = currentPreview.Select(a => a.targetCoord).ToList();
+            highlighter?.ShowTiles(coords, "red", grid);
             isPreviewingAttack = true;
         }
         else
@@ -201,7 +160,7 @@ public class PlayerController : MonoBehaviour, IGridEntity
         if (!isPreviewingMove)
         {
             currentMoveOptions = GetValidAdjacentTiles(CurrentCoord);
-            highlighter?.ShowTiles(currentMoveOptions, grid);
+            highlighter?.ShowTiles(currentMoveOptions, "blue", grid);
             isPreviewingMove = true;
         }
         else
@@ -293,6 +252,17 @@ public class PlayerController : MonoBehaviour, IGridEntity
         }
 
         return closest;
+    }
+
+    bool IsPointerOverContextMenu()
+    {
+        if (contextMenu == null) return false;
+
+        RectTransform rt = contextMenu.GetComponentInChildren<RectTransform>();
+        if (rt == null) return false;
+
+        Vector2 screenPoint = Mouse.current.position.ReadValue();
+        return RectTransformUtility.RectangleContainsScreenPoint(rt, screenPoint, Camera.main);
     }
 
     public void SetCoord(Vector2Int newCoord) => CurrentCoord = newCoord;

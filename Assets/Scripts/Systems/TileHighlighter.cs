@@ -4,61 +4,65 @@ using UnityEngine;
 public class TileHighlighter : MonoBehaviour
 {
     [SerializeField] private GridManager grid;
-    public GameObject highlightPrefab;
 
-    private readonly List<GameObject> activeHighlights = new();
+    [Header("Highlight Materials")]
+    public Material redMaterial;
+    public Material blueMaterial;
+
+    private Dictionary<Vector2Int, Material> originalMaterials = new();
+    private List<Vector2Int> highlightedCoords = new();
 
     void Awake()
     {
         if (grid == null)
         {
-            Debug.LogError("TileHighlighter: GridManager not assigned in inspector.");
+            grid = FindAnyObjectByType<GridManager>();
+            if (grid == null)
+                Debug.LogError("TileHighlighter: GridManager not assigned and not found.");
         }
     }
 
-    public void ShowTiles(List<Vector2Int> coords, GridManager gridOverride = null)
+    public void ShowTiles(List<Vector2Int> coords, string type = "blue", GridManager gridOverride = null)
     {
         ClearTiles();
 
         GridManager useGrid = gridOverride ?? grid;
+        Material highlightMat = type == "red" ? redMaterial : blueMaterial;
 
         foreach (var coord in coords)
         {
             if (!useGrid.IsValidCoord(coord)) continue;
 
             Tile tile = useGrid.GetTile(coord);
-            Vector3 tilePos = tile.worldPos;
+            if (tile.tileObject == null) continue;
 
-            float tileHeight = useGrid.tilePrefab.GetComponent<Renderer>().bounds.size.y;
-            Vector3 highlightPos = tilePos + Vector3.up * (tileHeight + 0.01f);
-
-            GameObject go = Instantiate(highlightPrefab, highlightPos, Quaternion.Euler(90, 0, 0));
-            go.transform.SetParent(transform);
-            MatchTileSize(go, useGrid);
-
-            activeHighlights.Add(go);
+            Renderer renderer = tile.tileObject.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                originalMaterials[coord] = renderer.material;
+                renderer.material = highlightMat;
+                highlightedCoords.Add(coord);
+            }
         }
     }
 
     public void ClearTiles()
     {
-        foreach (var go in activeHighlights)
+        foreach (var coord in highlightedCoords)
         {
-            Destroy(go);
-        }
-        activeHighlights.Clear();
-    }
+            if (!grid.IsValidCoord(coord)) continue;
 
-    private void MatchTileSize(GameObject highlight, GridManager gm)
-    {
-        if (gm.tilePrefab != null)
-        {
-            Renderer tileRenderer = gm.tilePrefab.GetComponent<Renderer>();
-            if (tileRenderer != null)
+            Tile tile = grid.GetTile(coord);
+            if (tile.tileObject == null) continue;
+
+            Renderer renderer = tile.tileObject.GetComponent<Renderer>();
+            if (renderer != null && originalMaterials.ContainsKey(coord))
             {
-                Vector3 tileSize = tileRenderer.bounds.size;
-                highlight.transform.localScale = new Vector3(tileSize.x, 1f, tileSize.z);
+                renderer.material = originalMaterials[coord];
             }
         }
+
+        originalMaterials.Clear();
+        highlightedCoords.Clear();
     }
 }
